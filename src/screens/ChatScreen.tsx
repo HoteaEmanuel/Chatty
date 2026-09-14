@@ -1,17 +1,20 @@
 import {
+  Button,
   FlatList,
   KeyboardAvoidingView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { s } from 'react-native-size-matters';
 import ResponseMessageCard from '../components/ResponseMessageCard';
 import SentMessageCard from '../components/SentMessageCard';
 import { RECEIVED, SENT } from '../constants/chat';
 import ChatInput from '../components/ChatInput';
 import { IS_IOS } from '../constants/platform';
+import EmptyChat from './EmptyChat';
+import { useKeyboardState } from '../hooks/useKeyboardState';
 type MESSAGE = {
   id: number;
   message: string;
@@ -41,8 +44,17 @@ const ChatScreen = () => {
     },
   ];
 
-  const [messages, setMessages] = useState<MESSAGE[]>(messageList);
+  const [messages, setMessages] = useState<MESSAGE[]>([]);
   const [messageInput, setMessageInput] = useState('');
+  const flatListRef = useRef<FlatList>(null);
+
+  const { isKeyboardVisible } = useKeyboardState();
+
+  const scrollToBottom = () => {
+    if (flatListRef.current && messages.length) {
+      flatListRef.current.scrollToEnd({ animated: true });
+    }
+  };
 
   const onMessageSent = () => {
     setMessages(prev => [
@@ -54,9 +66,12 @@ const ChatScreen = () => {
       },
     ]);
 
-    onGetRespose("Fck off boys");
+    onGetRespose('Fck off boys');
   };
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isKeyboardVisible]);
   const onGetRespose = (response: string) => {
     setTimeout(() => {
       setMessages(prev => [
@@ -76,6 +91,7 @@ const ChatScreen = () => {
         behavior={IS_IOS ? 'padding' : undefined}
       >
         <FlatList
+          ref={flatListRef}
           style={styles.messageList}
           data={messages}
           keyExtractor={item => item.id.toString()}
@@ -89,6 +105,9 @@ const ChatScreen = () => {
           contentContainerStyle={{
             padding: s(10),
           }}
+          onLayout={scrollToBottom}
+          onContentSizeChange={scrollToBottom}
+          ListEmptyComponent={EmptyChat}
         />
 
         <ChatInput
