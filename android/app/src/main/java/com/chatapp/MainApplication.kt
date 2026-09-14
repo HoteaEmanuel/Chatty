@@ -1,4 +1,4 @@
-package com.chatapp
+package com.hotea.chatty
 
 import android.app.Application
 import com.facebook.react.PackageList
