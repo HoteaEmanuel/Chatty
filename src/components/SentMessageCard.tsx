@@ -1,12 +1,15 @@
 import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import { s, vs } from 'react-native-size-matters';
-import { colors } from '../styles/colors';
+import { useThemedStyles } from '../theme';
+import type { Theme } from '../theme';
 
 interface SentMessageCardProps {
   message: string;
 }
 const SentMessageCard = ({ message }: SentMessageCardProps) => {
+  const styles = useThemedStyles(makeStyles);
+
   return (
     <View style={styles.container}>
       <View style={styles.messageContainer}>
@@ -18,21 +21,22 @@ const SentMessageCard = ({ message }: SentMessageCardProps) => {
 
 export default SentMessageCard;
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginVertical: vs(5),
-  },
-  messageContainer: {
-    backgroundColor: colors.black,
-    borderRadius: s(20),
-    maxWidth: '80%',
-    padding: s(12),
-  },
-  textMessage: {
-    fontSize: s(13),
-    color: colors.white,
-  },
-});
-
+const makeStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      marginVertical: vs(5),
+      marginHorizontal: s(8),
+    },
+    messageContainer: {
+      backgroundColor: theme.colors.userBubble,
+      borderRadius: s(20),
+      maxWidth: '80%',
+      padding: s(12),
+    },
+    textMessage: {
+      fontSize: s(13),
+      color: theme.colors.userBubbleText,
+    },
+  });

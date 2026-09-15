@@ -31,19 +31,19 @@ export const getHuggingFaceResponse = async (msg: string) => {
   }
 };
 
+export type OpenAIChatMessage = {
+  role: 'user' | 'assistant';
+  content: string;
+};
+
 const openAIURL = 'https://api.openai.com/v1/chat/completions';
-export const getOpenAIResponse = async (msg: string) => {
+export const getOpenAIResponse = async (messages: OpenAIChatMessage[]) => {
   try {
     const response = await axios.post(
       openAIURL,
       {
         model: 'gpt-5.4-nano',
-        messages: [
-          {
-            content: msg,
-            role: 'user',
-          },
-        ],
+        messages,
       },
       {
         headers: {

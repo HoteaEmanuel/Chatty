@@ -1,22 +1,25 @@
 import {
-  ActivityIndicator,
   FlatList,
   KeyboardAvoidingView,
   StyleSheet,
   View,
 } from 'react-native';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { s } from 'react-native-size-matters';
+import { useThemedStyles } from '../theme';
+import type { Theme } from '../theme';
+import ChatSkeleton from '../components/ChatSkeleton';
 import ResponseMessageCard from '../components/ResponseMessageCard';
 import SentMessageCard from '../components/SentMessageCard';
+import TypingIndicator from '../components/TypingIndicator';
 import { SENT } from '../constants/chat';
 import ChatInput from '../components/ChatInput';
 import { IS_IOS } from '../constants/platform';
 import EmptyChat from './EmptyChat';
-import { useKeyboardState } from '../hooks/useKeyboardState';
-import { getOpenAIResponse } from '../api/http-request';
 import { useChatSession } from '../navigation/ChatSessionContext';
 import { useConversationMessages } from '../hooks/useConversationMessages';
+import { useSendMessage, deriveConversationTitle } from '../hooks/useSendMessage';
 
 type MESSAGE = {
   id: string;
@@ -25,65 +28,88 @@ type MESSAGE = {
 };
 
 const ChatScreen = () => {
-  const { activeConversation } = useChatSession();
+  const { activeConversation, selectConversation } = useChatSession();
   const { messages: history, loading: loadingHistory } =
     useConversationMessages(activeConversation?.id ?? null);
+  const sendMessage = useSendMessage();
+  const queryClient = useQueryClient();
+  const styles = useThemedStyles(makeStyles);
 
   const [messages, setMessages] = useState<MESSAGE[]>([]);
   const [messageInput, setMessageInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const flatListRef = useRef<FlatList>(null);
-
-  const { isKeyboardVisible } = useKeyboardState();
 
   useEffect(() => {
     setMessages(history);
   }, [history, activeConversation?.id]);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     if (flatListRef.current && messages.length) {
       flatListRef.current.scrollToEnd({ animated: true });
     }
-  };
-
-  const onMessageSent = async () => {
-    setMessages(prev => [
-      ...prev,
-      {
-        id: `local-${Date.now()}-${Math.random()}`,
-        type: 'SENT',
-        message: messageInput,
-      },
-    ]);
-    setIsLoading(true);
-    const responseMsg = await getResFromAi(messageInput);
-    setIsLoading(false);
-    onGetRespose(responseMsg);
-
-    setMessageInput('');
-  };
-
-  const getResFromAi = async (msg: string) => {
-    const response = await getOpenAIResponse(msg);
-    return response;
-  };
+  }, [messages.length]);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isKeyboardVisible]);
+  }, [scrollToBottom]);
 
-  const onGetRespose = (response: string) => {
-    setTimeout(() => {
+  const onMessageSent = async () => {
+    const content = messageInput.trim();
+    if (!content || sendMessage.isPending) return;
+
+    setMessageInput('');
+    const sentEntry: MESSAGE = {
+      id: `local-${Date.now()}-sent`,
+      type: 'SENT',
+      message: content,
+    };
+    const chatHistory = messages.map(m => ({
+      role: m.type === SENT ? ('user' as const) : ('assistant' as const),
+      content: m.message,
+    }));
+    setMessages(prev => [...prev, sentEntry]);
+
+    try {
+      const { conversationId, reply } = await sendMessage.mutateAsync({
+        conversationId: activeConversation?.id ?? null,
+        content,
+        history: chatHistory,
+      });
+
+      const nextMessages = [
+        ...messages,
+        sentEntry,
+        {
+          id: `local-${Date.now()}-reply`,
+          type: 'RECEIVED' as const,
+          message: reply,
+        },
+      ];
+      setMessages(nextMessages);
+
+      if (!activeConversation) {
+        // Seed the cache so switching activeConversation doesn't briefly
+        // flash empty while the invalidated query re-fetches in the
+        // background.
+        queryClient.setQueryData(['messages', conversationId], nextMessages);
+        selectConversation({
+          id: conversationId,
+          title: deriveConversationTitle(content),
+        });
+      }
+    } catch {
       setMessages(prev => [
         ...prev,
         {
-          id: `local-${Date.now()}-${Math.random()}`,
+          id: `local-${Date.now()}-error`,
           type: 'RECEIVED',
-          message: response,
+          message: "Something went wrong sending that. Please try again.",
         },
       ]);
-    }, 1000);
+    }
   };
+
+  const isEmpty = messages.length === 0 && !loadingHistory;
 
   return (
     <View style={styles.container}>
@@ -92,41 +118,53 @@ const ChatScreen = () => {
         behavior={IS_IOS ? 'padding' : undefined}
       >
         {loadingHistory ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator />
+          <ChatSkeleton />
+        ) : isEmpty ? (
+          <View style={styles.emptyStateContainer}>
+            <EmptyChat />
+            <View style={styles.emptyStateInput}>
+              <ChatInput
+                messageValue={messageInput}
+                setMessageValue={setMessageInput}
+                onMessageSent={onMessageSent}
+                sending={sendMessage.isPending}
+                floating
+              />
+            </View>
           </View>
         ) : (
-          <FlatList
-            ref={flatListRef}
-            style={styles.messageList}
-            data={messages}
-            keyExtractor={item => item.id}
-            renderItem={({ item }) =>
-              item.type === SENT ? (
-                <SentMessageCard message={item.message} />
-              ) : (
-                <ResponseMessageCard message={item.message} />
-              )
-            }
-            contentContainerStyle={{
-              padding: s(10),
-            }}
-            onLayout={scrollToBottom}
-            onContentSizeChange={scrollToBottom}
-            ListEmptyComponent={EmptyChat}
-          />
+          <>
+            <FlatList
+              ref={flatListRef}
+              style={styles.messageList}
+              data={messages}
+              keyExtractor={item => item.id}
+              renderItem={({ item }) =>
+                item.type === SENT ? (
+                  <SentMessageCard message={item.message} />
+                ) : (
+                  <ResponseMessageCard message={item.message} />
+                )
+              }
+              contentContainerStyle={{
+                padding: s(10),
+              }}
+              onLayout={scrollToBottom}
+              onContentSizeChange={scrollToBottom}
+            />
+            {sendMessage.isPending && (
+              <View style={styles.typingRow}>
+                <TypingIndicator />
+              </View>
+            )}
+            <ChatInput
+              messageValue={messageInput}
+              setMessageValue={setMessageInput}
+              onMessageSent={onMessageSent}
+              sending={sendMessage.isPending}
+            />
+          </>
         )}
-
-        {isLoading && (
-          <View style={{ padding: s(10) }}>
-            <ResponseMessageCard message="Thinking... Thinking" />
-          </View>
-        )}
-        <ChatInput
-          messageValue={messageInput}
-          setMessageValue={setMessageInput}
-          onMessageSent={onMessageSent}
-        />
       </KeyboardAvoidingView>
     </View>
   );
@@ -134,20 +172,28 @@ const ChatScreen = () => {
 
 export default ChatScreen;
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-  },
-  keyboardAvoidingView: {
-    flex: 1,
-  },
-  messageList: {
-    flex: 1,
-  },
-  loadingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const makeStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    keyboardAvoidingView: {
+      flex: 1,
+    },
+    messageList: {
+      flex: 1,
+    },
+    emptyStateContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      paddingHorizontal: s(16),
+      gap: s(24),
+    },
+    emptyStateInput: {
+      width: '100%',
+    },
+    typingRow: {
+      paddingHorizontal: s(4),
+    },
+  });

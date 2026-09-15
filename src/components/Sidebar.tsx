@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Animated,
   Dimensions,
   Easing,
@@ -82,6 +83,10 @@ const makeStyles = (theme: Theme) =>
       color: theme.colors.textMuted,
       paddingHorizontal: s(12),
       paddingTop: vs(8),
+    },
+    loadingContainer: {
+      paddingTop: vs(16),
+      alignItems: 'center',
     },
     footer: {
       borderTopWidth: StyleSheet.hairlineWidth,
@@ -246,9 +251,13 @@ const Sidebar = () => {
             </TouchableOpacity>
           )}
           ListEmptyComponent={
-            !loading ? (
+            loading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator color={theme.colors.textMuted} />
+              </View>
+            ) : (
               <Text style={styles.emptyText}>No conversations yet</Text>
-            ) : undefined
+            )
           }
         />
 
