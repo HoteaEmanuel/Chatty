@@ -15,6 +15,7 @@ import ChatInput from '../components/ChatInput';
 import { IS_IOS } from '../constants/platform';
 import EmptyChat from './EmptyChat';
 import { useKeyboardState } from '../hooks/useKeyboardState';
+import { getHuggingFaceResponse, getOpenAIResponse } from '../api/http-request';
 type MESSAGE = {
   id: number;
   message: string;
@@ -46,6 +47,7 @@ const ChatScreen = () => {
 
   const [messages, setMessages] = useState<MESSAGE[]>([]);
   const [messageInput, setMessageInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const flatListRef = useRef<FlatList>(null);
 
   const { isKeyboardVisible } = useKeyboardState();
@@ -56,7 +58,7 @@ const ChatScreen = () => {
     }
   };
 
-  const onMessageSent = () => {
+  const onMessageSent = async () => {
     setMessages(prev => [
       ...prev,
       {
@@ -65,8 +67,17 @@ const ChatScreen = () => {
         message: messageInput,
       },
     ]);
+    setIsLoading(true);
+    const responseMsg = await getResFromAi(messageInput);
+    setIsLoading(false);
+    onGetRespose(responseMsg);
 
-    onGetRespose('Fck off boys');
+    setMessageInput('');
+  };
+
+  const getResFromAi = async (msg: string) => {
+    const response = await getOpenAIResponse(msg);
+    return response;
   };
 
   useEffect(() => {
@@ -82,7 +93,7 @@ const ChatScreen = () => {
           message: response,
         },
       ]);
-    }, 2000);
+    }, 1000);
   };
   return (
     <View style={styles.container}>
@@ -110,6 +121,11 @@ const ChatScreen = () => {
           ListEmptyComponent={EmptyChat}
         />
 
+        {isLoading && (
+          <View style={{padding:s(10  )}}>
+            <ResponseMessageCard message="Thinking... Thinking" />
+          </View>
+        )}
         <ChatInput
           messageValue={messageInput}
           setMessageValue={setMessageInput}

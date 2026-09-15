@@ -3,6 +3,7 @@ import React from 'react';
 import { colors } from '../styles/colors';
 import { s, vs } from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
+import { useKeyboardState } from '../hooks/useKeyboardState';
 interface ChatInputProps {
   messageValue: string;
   setMessageValue: (message: string) => void;
@@ -13,6 +14,7 @@ const ChatInput = ({
   setMessageValue,
   onMessageSent,
 }: ChatInputProps) => {
+  const { isKeyboardVisible } = useKeyboardState();
   const handleSendMessage = () => {
     if (!messageValue.trim().length) return;
 
@@ -20,7 +22,12 @@ const ChatInput = ({
     setMessageValue('');
   };
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { paddingBottom: isKeyboardVisible ? vs(10) : vs(20) },
+      ]}
+    >
       <TextInput
         style={styles.input}
         placeholder="Sent a message..."
@@ -41,11 +48,10 @@ export default ChatInput;
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    padding: s(10),
     backgroundColor: colors.white,
     borderTopWidth: 1,
     borderTopColor: colors.mediumGray,
-    paddingBottom: vs(20),
+    padding:vs(5)
   },
   input: {
     flex: 1,

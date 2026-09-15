@@ -6,19 +6,21 @@ interface TypingEffectProps {
   style?: TextStyle;
 }
 const TypingEffect = ({ text, style }: TypingEffectProps) => {
-  const words = text.split(' ');
-  console.log('SPLITED TEXT: ', words);
+  const words = text?.split(' ');
+
   const [displayedText, setDisplayedText] = useState('');
 
   useEffect(() => {
-    let index = 0;
+    let index = -1;
     const interval = setInterval(() => {
       console.log('INDEX: ', index);
-      if (index < words.length - 1) {
-        setDisplayedText(prev => prev + ' ' + words[index]);
+      if (index < words?.length - 1) {
+        setDisplayedText(prev =>
+          prev ? prev + ' ' + words[index] : words[index],
+        );
         index++;
       } else clearInterval(interval);
-    }, 500);
+    }, 200);
 
     return () => clearInterval(interval);
   }, [text]);

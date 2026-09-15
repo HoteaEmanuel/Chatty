@@ -77,3 +77,10 @@ yarn-error.log
 # Firebase config (contains API keys / OAuth client IDs)
 google-services.json
 GoogleService-Info.plist
+
+# API keys
+src/keys/keys.ts
+
+# Supabase CLI local link state
+supabase/.temp
+supabase/.branches
