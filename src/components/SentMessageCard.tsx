@@ -1,18 +1,39 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import { s, vs } from 'react-native-size-matters';
-import { useThemedStyles } from '../theme';
+import { useTheme, useThemedStyles } from '../theme';
 import type { Theme } from '../theme';
+import { useAttachmentUrl } from '../hooks/useAttachmentUrl';
+import type { StoredAttachment } from '../types/attachments';
 
 interface SentMessageCardProps {
   message: string;
+  attachment?: StoredAttachment | null;
 }
-const SentMessageCard = ({ message }: SentMessageCardProps) => {
+const SentMessageCard = ({ message, attachment = null }: SentMessageCardProps) => {
   const styles = useThemedStyles(makeStyles);
+  const theme = useTheme();
+  const { data: attachmentUrl, isLoading: attachmentUrlLoading } =
+    useAttachmentUrl(attachment);
 
   return (
     <View style={styles.container}>
       <View style={styles.messageContainer}>
+        {attachment && (
+          <View style={styles.thumbnailWrap}>
+            {attachmentUrl ? (
+              <Image
+                source={{ uri: attachmentUrl }}
+                style={styles.thumbnail}
+                resizeMode="cover"
+              />
+            ) : (
+              attachmentUrlLoading && (
+                <ActivityIndicator size="small" color={theme.colors.textMuted} />
+              )
+            )}
+          </View>
+        )}
         <Text style={styles.textMessage}>{message}</Text>
       </View>
     </View>
@@ -38,5 +59,19 @@ const makeStyles = (theme: Theme) =>
     textMessage: {
       fontSize: s(13),
       color: theme.colors.userBubbleText,
+    },
+    thumbnailWrap: {
+      width: s(180),
+      height: s(180),
+      borderRadius: s(14),
+      overflow: 'hidden',
+      backgroundColor: theme.colors.surface,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: vs(8),
+    },
+    thumbnail: {
+      width: '100%',
+      height: '100%',
     },
   });

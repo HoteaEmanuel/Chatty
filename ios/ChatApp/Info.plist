@@ -46,6 +46,10 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Chatty uses your location to show your position on the map when you choose to enable it.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Chatty needs access to your photo library so you can attach an image to a message.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Chatty needs camera access so you can take a photo to attach to a message.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>BootSplash</string>
 	<key>UIRequiredDeviceCapabilities</key>

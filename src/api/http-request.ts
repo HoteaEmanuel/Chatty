@@ -31,9 +31,13 @@ export const getHuggingFaceResponse = async (msg: string) => {
   }
 };
 
+export type OpenAIContentPart =
+  | { type: 'text'; text: string }
+  | { type: 'image_url'; image_url: { url: string } };
+
 export type OpenAIChatMessage = {
   role: 'user' | 'assistant';
-  content: string;
+  content: string | OpenAIContentPart[];
 };
 
 const openAIURL = 'https://api.openai.com/v1/chat/completions';
