@@ -2,18 +2,17 @@ import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import AppIcon from '../components/AppIcon';
 import { s, vs } from 'react-native-size-matters';
-import { useTheme, useThemedStyles } from '../theme';
+import { useThemedStyles } from '../theme';
 import type { Theme } from '../theme';
 import { useProfile } from '../hooks/useProfile';
 
 const EmptyChat = () => {
   const { displayName } = useProfile();
   const styles = useThemedStyles(makeStyles);
-  const theme = useTheme();
 
   return (
     <View style={styles.container}>
-      <AppIcon size={60} tintColor={theme.colors.text} />
+      <AppIcon size={60} />
       <View style={styles.textContainer}>
         <Text style={styles.title}>Hello, </Text>
         <Text style={styles.nameText}>{displayName}</Text>

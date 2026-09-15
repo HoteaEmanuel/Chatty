@@ -11,8 +11,8 @@ const AppIcon = ({ size = 48, style, ...props }: AppIconProps) => {
       accessibilityLabel="Chatty app icon"
       resizeMode="contain"
       {...props}
-      source={require('../assets/splash.png')}
-      style={[{ width: size, height: size }, style]}
+      source={require('../assets/chatty-icon.png')}
+      style={[{ width: size, height: size, borderRadius: size * 0.23 }, style]}
     />
   );
 };
