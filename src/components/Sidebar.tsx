@@ -22,6 +22,7 @@ import { useChatSession } from '../navigation/ChatSessionContext';
 import { useConversations } from '../hooks/useConversations';
 import { useProfile } from '../hooks/useProfile';
 import { navigationRef } from '../navigation/navigationRef';
+import ConversationItem from './ConversationItem';
 
 const SIDEBAR_WIDTH = Math.min(320, Dimensions.get('window').width * 0.82);
 
@@ -65,18 +66,6 @@ const makeStyles = (theme: Theme) =>
       color: theme.colors.textMuted,
       paddingHorizontal: s(12),
       marginBottom: vs(4),
-    },
-    conversationRow: {
-      paddingVertical: vs(10),
-      paddingHorizontal: s(12),
-      borderRadius: s(10),
-    },
-    conversationRowActive: {
-      backgroundColor: theme.colors.border,
-    },
-    conversationTitle: {
-      fontSize: s(14),
-      color: theme.colors.text,
     },
     emptyText: {
       fontSize: s(13),
@@ -153,9 +142,6 @@ const Sidebar = () => {
   const { displayName, profile } = useProfile();
 
   const translateX = useRef(new Animated.Value(-SIDEBAR_WIDTH)).current;
-  // Modal unmounts its content as soon as `visible` goes false, which would
-  // cut the slide-out animation short — so this trails `isOpen` by the
-  // animation's duration instead of mirroring it directly.
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
@@ -237,18 +223,11 @@ const Sidebar = () => {
           data={conversations}
           keyExtractor={item => item.id}
           renderItem={({ item }) => (
-            <TouchableOpacity
-              style={[
-                styles.conversationRow,
-                activeConversation?.id === item.id &&
-                  styles.conversationRowActive,
-              ]}
+            <ConversationItem
+              conversation={item}
+              active={activeConversation?.id === item.id}
               onPress={() => handleSelectConversation(item)}
-            >
-              <Text numberOfLines={1} style={styles.conversationTitle}>
-                {item.title}
-              </Text>
-            </TouchableOpacity>
+            />
           )}
           ListEmptyComponent={
             loading ? (

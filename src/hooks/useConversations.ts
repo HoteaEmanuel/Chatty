@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../auth/AuthProvider';
 
@@ -8,8 +8,6 @@ export type ConversationSummary = {
   last_message_at: string;
 };
 
-// Stable identity so `data ?? []` doesn't hand back a new array reference
-// on every render while the query has no data yet.
 const EMPTY_CONVERSATIONS: ConversationSummary[] = [];
 
 export function useConversations() {
@@ -33,4 +31,40 @@ export function useConversations() {
     loading: query.isLoading,
     refresh: query.refetch,
   };
+}
+
+export function useRenameConversation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, title }: { id: string; title: string }) => {
+      const { error } = await supabase
+        .from('conversations')
+        .update({ title })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+    },
+  });
+}
+
+// Soft delete: flips `archived_at`, which the list query already filters on,
+// rather than removing the row outright.
+export function useDeleteConversation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('conversations')
+        .update({ archived_at: new Date().toISOString() })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+    },
+  });
 }
