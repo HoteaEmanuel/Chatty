@@ -2091,6 +2091,11 @@
   dependencies:
     idb "8.0.3"
 
+"@react-native-clipboard/clipboard@^1.16.3":
+  version "1.16.3"
+  resolved "https://registry.yarnpkg.com/@react-native-clipboard/clipboard/-/clipboard-1.16.3.tgz#7807a90fd9984bf4d3a96faf2eee20457984a9bd"
+  integrity sha512-cMIcvoZKIrShzJHEaHbTAp458R9WOv0fB6UyC7Ek4Qk561Ow/DrzmmJmH/rAZg21Z6ixJ4YSdFDC14crqIBmCQ==
+
 "@react-native-community/cli-clean@20.2.0":
   version "20.2.0"
   resolved "https://registry.npmjs.org/@react-native-community/cli-clean/-/cli-clean-20.2.0.tgz"
@@ -6699,6 +6704,11 @@ react-native-bootsplash@^7.3.2:
     sharp "^0.35.2"
     ts-dedent "^2.2.0"
     xml-formatter "^3.7.0"
+
+react-native-enriched-markdown@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/react-native-enriched-markdown/-/react-native-enriched-markdown-1.0.2.tgz#01145e8b35a18e5385086841252ea9d85c6b5427"
+  integrity sha512-zvVM4W1VMV/cYAKUTYoVheadOGHLbny2kALFn0vi5av/WFa0JSYboeeq/vPRqS5dc8qvUTjXwVlrkhrcuinNQA==
 
 react-native-image-picker@^8.2.1:
   version "8.2.1"
