@@ -28,6 +28,15 @@
 	<true/>
 	<key>GoogleMapsAPIKey</key>
 	<string>$(GOOGLE_MAPS_IOS_API_KEY)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.991714156421-8u7bifao028d2ou41dqmjrpcdhom523t</string>
+			</array>
+		</dict>
+	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

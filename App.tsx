@@ -1,15 +1,14 @@
-import { FlatList, StatusBar, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import React, { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { useNotifications } from './src/notifications/useNotifications';
-import CameraGallery from './src/learn/CameraGallery';
 import BootSplash from 'react-native-bootsplash';
-import GoogleMap from './src/learn/GoogleMap';
-import AppHeader from './src/components/AppHeader';
-import SentMessageCard from './src/components/SentMessageCard';
-import ResponseMessageCard from './src/components/ResponseMessageCard';
-import { s } from 'react-native-size-matters';
-import ChatScreen from './src/screens/ChatScreen';
+import { AuthProvider } from './src/auth/AuthProvider';
+import { ThemeProvider } from './src/theme';
+import { queryClient } from './src/lib/queryClient';
+import RootNavigator from './src/navigation/RootNavigator';
+
 const App = () => {
   useNotifications();
 
@@ -20,13 +19,18 @@ const App = () => {
 
     init().finally(async () => {
       await BootSplash.hide({ fade: true });
-      console.log('BootSplash has been hidd en successfully');
+      console.log('BootSplash has been hidden successfully');
     });
   }, []);
   return (
     <SafeAreaProvider style={styles.container}>
-      <AppHeader />
-      <ChatScreen />
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <RootNavigator />
+          </AuthProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 };

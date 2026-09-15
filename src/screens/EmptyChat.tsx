@@ -3,14 +3,17 @@ import React from 'react';
 import AppIcon from '../components/AppIcon';
 import { s, vs } from 'react-native-size-matters';
 import { colors } from '../styles/colors';
+import { useProfile } from '../hooks/useProfile';
 
 const EmptyChat = () => {
+  const { displayName } = useProfile();
+
   return (
     <View style={styles.container}>
       <AppIcon size={60} tintColor={colors.black} />
       <View style={styles.textContainer}>
         <Text style={styles.title}>Hello, </Text>
-        <Text style={styles.nameText}>Domitian</Text>
+        <Text style={styles.nameText}>{displayName}</Text>
       </View>
 
       <Text style={styles.subTitle}>What should we do today?</Text>
