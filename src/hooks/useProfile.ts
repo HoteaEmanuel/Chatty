@@ -7,6 +7,7 @@ export type Profile = {
   email: string | null;
   fullName: string | null;
   avatarUrl: string | null;
+  themePreference: 'light' | 'dark' | null;
 };
 
 export function useProfile() {
@@ -16,7 +17,7 @@ export function useProfile() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, email, full_name, avatar_url')
+        .select('id, email, full_name, avatar_url, theme_preference')
         .eq('id', session!.user.id)
         .single();
       if (error) throw error;
@@ -25,6 +26,7 @@ export function useProfile() {
         email: data.email,
         fullName: data.full_name,
         avatarUrl: data.avatar_url,
+        themePreference: data.theme_preference,
       } as Profile;
     },
     enabled: !!session,
@@ -53,7 +55,11 @@ export function useUpdateProfile() {
       updates,
     }: {
       id: string;
-      updates: Partial<{ full_name: string; avatar_url: string }>;
+      updates: Partial<{
+        full_name: string;
+        avatar_url: string;
+        theme_preference: 'light' | 'dark';
+      }>;
     }) => {
       const { error } = await supabase
         .from('profiles')
