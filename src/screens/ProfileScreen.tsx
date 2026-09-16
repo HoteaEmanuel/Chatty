@@ -1,6 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useState } from 'react';
 import { s, vs } from 'react-native-size-matters';
+import Feather from 'react-native-vector-icons/Feather';
 import { useTheme, useThemedStyles } from '../theme';
 import type { Theme } from '../theme';
 import AuthButton from '../components/AuthButton';
@@ -32,6 +33,23 @@ const makeStyles = (theme: Theme) =>
       color: theme.colors.textMuted,
       marginBottom: vs(24),
     },
+    editProfileRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      width: '100%',
+      paddingVertical: vs(14),
+      paddingHorizontal: s(16),
+      borderRadius: s(12),
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.surface,
+    },
+    editProfileLabel: {
+      fontSize: s(15),
+      fontWeight: '600',
+      color: theme.colors.text,
+    },
     signOutButton: {
       width: '100%',
       backgroundColor: theme.colors.danger,
@@ -40,10 +58,11 @@ const makeStyles = (theme: Theme) =>
 
 const ProfileScreen = () => {
   const styles = useThemedStyles(makeStyles);
+  const theme = useTheme();
   const { session } = useAuth();
   const { profile, displayName } = useProfile();
   const [isSigningOut, setIsSigningOut] = useState(false);
-  const navigation = useNavigation();
+ 
   const handleSignOut = async () => {
     setIsSigningOut(true);
     try {
@@ -57,15 +76,17 @@ const ProfileScreen = () => {
 
   return (
     <View style={styles.container}>
-      <UserAvatar />
+      <UserAvatar size={100}/>
       <Text style={styles.name}>{displayName}</Text>
       <Text style={styles.email}>{profile?.email ?? session?.user.email}</Text>
 
       <TouchableOpacity
-        style={styles.signOutButton}
+        style={styles.editProfileRow}
         onPress={() => navigationRef.navigate('EditProfile')}
+        activeOpacity={0.7}
       >
-        <Text>Edit Profile</Text>
+        <Text style={styles.editProfileLabel}>Edit Profile</Text>
+        <Feather name="chevron-right" size={18} color={theme.colors.textMuted} />
       </TouchableOpacity>
       <AuthButton
         label="Sign out"

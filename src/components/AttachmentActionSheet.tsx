@@ -13,6 +13,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import { useTheme, useThemedStyles } from '../theme';
 import type { Theme } from '../theme';
 import type { MenuAnchor } from './ConversationOptionsMenu';
+import { useActionSheet } from '../hooks/useActionSheet';
 
 const MENU_WIDTH = s(190);
 // Rough height of the two-row menu, used only to decide whether it should
@@ -60,23 +61,21 @@ const makeStyles = (theme: Theme) =>
 type AttachmentActionSheetProps = {
   visible: boolean;
   anchor: MenuAnchor | null;
-  // Each row renders only when its handler is provided, so a consumer that
-  // only supports one picking method doesn't need a no-op for the other.
-  onChooseLibrary?: () => void;
-  onTakePhoto?: () => void;
+
   onClose: () => void;
+  onTakePhoto: () => void;
+  onGalleryPick: () => void;
 };
 
 const AttachmentActionSheet = ({
   visible,
   anchor,
-  onChooseLibrary,
-  onTakePhoto,
   onClose,
+  onGalleryPick,
+  onTakePhoto,
 }: AttachmentActionSheetProps) => {
   const styles = useThemedStyles(makeStyles);
   const theme = useTheme();
-
   if (!visible || !anchor) return null;
 
   const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -104,19 +103,16 @@ const AttachmentActionSheet = ({
         <View style={styles.backdrop} />
       </TouchableWithoutFeedback>
       <View style={[styles.menu, { left, top }]}>
-        {onChooseLibrary && (
-          <TouchableOpacity style={styles.option} onPress={onChooseLibrary}>
-            <Feather name="image" size={16} color={theme.colors.text} />
-            <Text style={styles.optionText}>Choose from library</Text>
-          </TouchableOpacity>
-        )}
-        {onChooseLibrary && onTakePhoto && <View style={styles.separator} />}
-        {onTakePhoto && (
-          <TouchableOpacity style={styles.option} onPress={onTakePhoto}>
-            <Feather name="camera" size={16} color={theme.colors.text} />
-            <Text style={styles.optionText}>Take photo</Text>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity style={styles.option} onPress={onGalleryPick}>
+          <Feather name="image" size={16} color={theme.colors.text} />
+          <Text style={styles.optionText}>Choose from library</Text>
+        </TouchableOpacity>
+        <View style={styles.separator} />
+
+        <TouchableOpacity style={styles.option} onPress={onTakePhoto}>
+          <Feather name="camera" size={16} color={theme.colors.text} />
+          <Text style={styles.optionText}>Take photo</Text>
+        </TouchableOpacity>
       </View>
     </Modal>
   );

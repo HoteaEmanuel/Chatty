@@ -25,3 +25,11 @@ export async function signUpWithEmail(
   if (error) throw error;
   return data.session;
 }
+
+// Updates the current session's password. No re-auth with the old password
+// is needed here - `updateUser` authorizes off the session's own JWT, unlike
+// a full password-reset flow.
+export async function updatePassword(newPassword: string) {
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) throw error;
+}

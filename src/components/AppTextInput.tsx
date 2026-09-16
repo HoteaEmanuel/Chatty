@@ -16,6 +16,12 @@ const makeStyles = (theme: Theme) =>
       width: '100%',
       gap: vs(4),
     },
+    label: {
+      fontSize: s(13),
+      fontWeight: '600',
+      color: theme.colors.textMuted,
+      paddingHorizontal: s(4),
+    },
     input: {
       width: '100%',
       borderWidth: 1,
@@ -37,19 +43,22 @@ const makeStyles = (theme: Theme) =>
     },
   });
 
-type AuthTextFieldProps = TextInputProps & {
+type AppTextInputProps = TextInputProps & {
+  label?: string;
   errorMessage?: string;
 };
 
-const AuthTextField = ({
+const AppTextInput = ({
+  label,
   errorMessage,
   style,
   ...props
-}: AuthTextFieldProps) => {
+}: AppTextInputProps) => {
   const styles = useThemedStyles(makeStyles);
   const theme = useTheme();
   return (
     <View style={styles.container}>
+      {label && <Text style={styles.label}>{label}</Text>}
       <TextInput
         placeholderTextColor={theme.colors.placeholder}
         autoCapitalize="none"
@@ -62,4 +71,4 @@ const AuthTextField = ({
   );
 };
 
-export default AuthTextField;
+export default AppTextInput;

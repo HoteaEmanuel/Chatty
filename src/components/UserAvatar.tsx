@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, ImageProps, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import { useProfile } from '../hooks/useProfile';
 import { useThemedStyles } from '../theme';
@@ -10,7 +10,6 @@ const makeStyles = (theme: Theme) =>
       width: s(84),
       height: s(84),
       borderRadius: s(42),
-      backgroundColor: theme.colors.accent,
       alignItems: 'center',
       justifyContent: 'center',
       marginBottom: vs(8),
@@ -21,18 +20,28 @@ const makeStyles = (theme: Theme) =>
       color: theme.colors.background,
     },
     image: {
-      flex: 1,
+      height: '100',
+      width: '100%',
       resizeMode: 'cover',
-      borderRadius: '50%',
+      borderRadius: s(42),
     },
   });
-const UserAvatar = () => {
+
+type UserAvatarProps = {
+  style?: ImageProps;
+  size?: number;
+};
+const UserAvatar = ({ style, size = 50 }: UserAvatarProps) => {
   const { displayName, profile } = useProfile();
+
   const styles = useThemedStyles(makeStyles);
   return (
-    <View style={styles.avatar}>
+    <View style={[styles.avatar, { height: s(size), width: vs(size) }]}>
       {profile?.avatarUrl ? (
-        <Image style={styles.image} source={{ uri: profile.avatarUrl }} />
+        <Image
+          style={[styles.image, { height: size, width: size }, style]}
+          source={{ uri: profile.avatarUrl }}
+        />
       ) : (
         <Text style={styles.avatarInitial}>{displayName.charAt(0)} </Text>
       )}

@@ -16,6 +16,7 @@ import { useKeyboardState } from '../hooks/useKeyboardState';
 import type { StagedAttachmentState } from '../types/attachments';
 import AttachmentActionSheet from './AttachmentActionSheet';
 import type { MenuAnchor } from './ConversationOptionsMenu';
+import { useActionSheet } from '../hooks/useActionSheet';
 
 const IDLE_ATTACHMENT: StagedAttachmentState = { status: 'idle' };
 
@@ -46,7 +47,8 @@ const ChatInput = ({
   const styles = useThemedStyles(makeStyles);
   const theme = useTheme();
 
-  const attachButtonRef = useRef<React.ElementRef<typeof TouchableOpacity>>(null);
+  const attachButtonRef =
+    useRef<React.ElementRef<typeof TouchableOpacity>>(null);
   const [sheetVisible, setSheetVisible] = useState(false);
   const [sheetAnchor, setSheetAnchor] = useState<MenuAnchor | null>(null);
 
@@ -99,7 +101,10 @@ const ChatInput = ({
               attachment.status === 'error' && styles.thumbnailWrapError,
             ]}
           >
-            <Image source={{ uri: attachment.localUri }} style={styles.thumbnail} />
+            <Image
+              source={{ uri: attachment.localUri }}
+              style={styles.thumbnail}
+            />
             {isUploading && (
               <View style={styles.thumbnailOverlay}>
                 <ActivityIndicator size="small" color="#FFFFFF" />
@@ -166,8 +171,8 @@ const ChatInput = ({
         <AttachmentActionSheet
           visible={sheetVisible}
           anchor={sheetAnchor}
-          onChooseLibrary={handleChooseLibrary}
-          onTakePhoto={handleTakePhoto}
+          onGalleryPick={handleChooseLibrary ?? (() => {})}
+          onTakePhoto={handleTakePhoto ?? (() => {})}
           onClose={() => setSheetVisible(false)}
         />
       )}

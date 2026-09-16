@@ -147,7 +147,7 @@ export function useAttachmentUpload({
           .select('conversation_id')
           .eq('id', id);
 
-        console.log('ADDED attachment: ', attachment);
+      
         if (!attachment.data) return;
         const { conversation_id } = attachment.data[0];
         if (conversation_id) {

@@ -11,7 +11,7 @@ import React, { useEffect, useState } from 'react';
 import { s, vs } from 'react-native-size-matters';
 import { useTheme, useThemedStyles } from '../theme';
 import type { Theme } from '../theme';
-import AuthTextField from './AuthTextField';
+import AppTextInput from './AppTextInput';
 
 const MAX_TITLE_LENGTH = 100;
 
@@ -121,7 +121,7 @@ const RenameConversationModal = ({
           <TouchableWithoutFeedback>
             <View style={styles.card}>
               <Text style={styles.title}>Rename conversation</Text>
-              <AuthTextField
+              <AppTextInput
                 value={title}
                 onChangeText={setTitle}
                 placeholder="Conversation title"

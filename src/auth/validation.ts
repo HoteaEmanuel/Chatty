@@ -20,5 +20,24 @@ export const signUpSchema = z
     path: ['confirmPassword'],
   });
 
+export const editProfileSchema = z
+  .object({
+    fullName: z.string().trim().min(3, 'Enter your name'),
+    newPassword: z.string().optional(),
+    confirmPassword: z.string().optional(),
+  })
+  .refine(
+    data => !data.newPassword || data.newPassword.length >= 6,
+    {
+      message: 'Password must be at least 6 characters',
+      path: ['newPassword'],
+    },
+  )
+  .refine(data => data.newPassword === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
+
 export type SignInInput = z.infer<typeof signInSchema>;
 export type SignUpInput = z.infer<typeof signUpSchema>;
+export type EditProfileInput = z.infer<typeof editProfileSchema>;

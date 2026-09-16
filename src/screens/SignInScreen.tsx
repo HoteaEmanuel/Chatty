@@ -16,7 +16,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useThemedStyles } from '../theme';
 import type { Theme } from '../theme';
 import AppIcon from '../components/AppIcon';
-import AuthTextField from '../components/AuthTextField';
+import AppTextInput from '../components/AppTextInput';
 import AuthButton from '../components/AuthButton';
 import { GoogleSignInCancelledError, signInWithGoogle } from '../auth/google';
 import { signInWithEmail } from '../auth/email';
@@ -156,7 +156,7 @@ const SignInScreen = ({ navigation }: Props) => {
             control={control}
             name="email"
             render={({ field }) => (
-              <AuthTextField
+              <AppTextInput
                 placeholder="Email"
                 keyboardType="email-address"
                 textContentType="emailAddress"
@@ -172,7 +172,7 @@ const SignInScreen = ({ navigation }: Props) => {
             control={control}
             name="password"
             render={({ field }) => (
-              <AuthTextField
+              <AppTextInput
                 placeholder="Password"
                 secureTextEntry
                 textContentType="password"

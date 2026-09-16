@@ -23,6 +23,7 @@ import { useConversations } from '../hooks/useConversations';
 import { useProfile } from '../hooks/useProfile';
 import { navigationRef } from '../navigation/navigationRef';
 import ConversationItem from './ConversationItem';
+import UserAvatar from './UserAvatar';
 
 const SIDEBAR_WIDTH = Math.min(320, Dimensions.get('window').width * 0.82);
 
@@ -242,11 +243,7 @@ const Sidebar = () => {
 
         <View style={[styles.footer, { paddingBottom: insets.bottom + vs(8) }]}>
           <TouchableOpacity style={styles.footerRow} onPress={handleProfile}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarInitial}>
-                {displayName.charAt(0).toUpperCase()}
-              </Text>
-            </View>
+            <UserAvatar />
             <View style={styles.footerInfo}>
               <Text numberOfLines={1} style={styles.footerName}>
                 {displayName}
