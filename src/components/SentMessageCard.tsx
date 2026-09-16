@@ -1,10 +1,18 @@
-import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
-import React from 'react';
+import {
+  ActivityIndicator,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import React, { useState } from 'react';
 import { s, vs } from 'react-native-size-matters';
 import { useTheme, useThemedStyles } from '../theme';
 import type { Theme } from '../theme';
 import { useAttachmentUrl } from '../hooks/useAttachmentUrl';
 import type { StoredAttachment } from '../types/attachments';
+import AttachmentPreviewModal from './AttachmentPreviewModal';
 
 interface SentMessageCardProps {
   message: string;
@@ -15,12 +23,18 @@ const SentMessageCard = ({ message, attachment = null }: SentMessageCardProps) =
   const theme = useTheme();
   const { data: attachmentUrl, isLoading: attachmentUrlLoading } =
     useAttachmentUrl(attachment);
+  const [previewVisible, setPreviewVisible] = useState(false);
 
   return (
     <View style={styles.container}>
       <View style={styles.messageContainer}>
         {attachment && (
-          <View style={styles.thumbnailWrap}>
+          <TouchableOpacity
+            style={styles.thumbnailWrap}
+            onPress={() => setPreviewVisible(true)}
+            disabled={!attachmentUrl}
+            activeOpacity={0.8}
+          >
             {attachmentUrl ? (
               <Image
                 source={{ uri: attachmentUrl }}
@@ -32,10 +46,17 @@ const SentMessageCard = ({ message, attachment = null }: SentMessageCardProps) =
                 <ActivityIndicator size="small" color={theme.colors.textMuted} />
               )
             )}
-          </View>
+          </TouchableOpacity>
         )}
         <Text style={styles.textMessage}>{message}</Text>
       </View>
+
+      <AttachmentPreviewModal
+        visible={previewVisible}
+        attachment={attachment}
+        url={attachmentUrl}
+        onClose={() => setPreviewVisible(false)}
+      />
     </View>
   );
 };

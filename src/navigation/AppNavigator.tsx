@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AppHeader from '../components/AppHeader';
 import Sidebar from '../components/Sidebar';
 import ChatScreen from '../screens/ChatScreen';
+import ImagesScreen from '../screens/ImagesScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import { useTheme } from '../theme';
@@ -32,6 +33,16 @@ const AppNavigator = () => {
         <View style={styles.root}>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Chat" component={ChatHome} />
+            <Stack.Screen
+              name="Images"
+              component={ImagesScreen}
+              options={{
+                headerShown: true,
+                title: 'Images',
+                headerStyle: { backgroundColor: theme.colors.background },
+                headerTintColor: theme.colors.text,
+              }}
+            />
             <Stack.Screen
               name="Profile"
               component={ProfileScreen}

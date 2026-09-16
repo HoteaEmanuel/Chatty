@@ -44,7 +44,12 @@ const makeStyles = (theme: Theme) =>
       borderRightColor: theme.colors.border,
       paddingHorizontal: s(12),
     },
-    newChatButton: {
+    navGroup: {
+      marginTop: vs(12),
+      marginBottom: vs(16),
+      gap: vs(8),
+    },
+    navButton: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: s(10),
@@ -53,10 +58,8 @@ const makeStyles = (theme: Theme) =>
       borderRadius: s(12),
       borderWidth: 1,
       borderColor: theme.colors.border,
-      marginTop: vs(12),
-      marginBottom: vs(16),
     },
-    newChatText: {
+    navButtonText: {
       fontSize: s(15),
       fontWeight: '600',
       color: theme.colors.text,
@@ -187,6 +190,11 @@ const Sidebar = () => {
     goToChat();
   };
 
+  const handleImages = () => {
+    close();
+    if (navigationRef.isReady()) navigationRef.navigate('Images');
+  };
+
   const handleProfile = () => {
     close();
     if (navigationRef.isReady()) navigationRef.navigate('Profile');
@@ -214,10 +222,16 @@ const Sidebar = () => {
           { paddingTop: insets.top, transform: [{ translateX }] },
         ]}
       >
-        <TouchableOpacity style={styles.newChatButton} onPress={handleNewChat}>
-          <Feather name="edit" size={18} color={theme.colors.text} />
-          <Text style={styles.newChatText}>New chat</Text>
-        </TouchableOpacity>
+        <View style={styles.navGroup}>
+          <TouchableOpacity style={styles.navButton} onPress={handleNewChat}>
+            <Feather name="edit" size={18} color={theme.colors.text} />
+            <Text style={styles.navButtonText}>New chat</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.navButton} onPress={handleImages}>
+            <Feather name="image" size={18} color={theme.colors.text} />
+            <Text style={styles.navButtonText}>Images</Text>
+          </TouchableOpacity>
+        </View>
 
         <Text style={styles.sectionLabel}>Recent</Text>
         <FlatList
@@ -243,7 +257,7 @@ const Sidebar = () => {
 
         <View style={[styles.footer, { paddingBottom: insets.bottom + vs(8) }]}>
           <TouchableOpacity style={styles.footerRow} onPress={handleProfile}>
-            <UserAvatar />
+            <UserAvatar  />
             <View style={styles.footerInfo}>
               <Text numberOfLines={1} style={styles.footerName}>
                 {displayName}

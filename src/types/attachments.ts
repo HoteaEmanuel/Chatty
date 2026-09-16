@@ -8,6 +8,14 @@ export type StoredAttachment = {
   fileName: string | null;
 };
 
+export type ImageAttachment = StoredAttachment & {
+  conversationId: string;
+  conversationTitle: string;
+  sizeBytes: number;
+  createdAt: string;
+  url: string;
+};
+
 export type StagedAttachmentState =
   | { status: 'idle' }
   | { status: 'uploading'; localUri: string }
