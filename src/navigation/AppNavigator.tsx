@@ -10,6 +10,7 @@ import { useTheme } from '../theme';
 import { ChatSessionProvider } from './ChatSessionContext';
 import { SidebarProvider } from './SidebarContext';
 import type { AppStackParamList } from './types';
+import EditProfileScreen from '../screens/EditProfileScreen';
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
 
@@ -37,6 +38,17 @@ const AppNavigator = () => {
               options={{
                 headerShown: true,
                 title: 'Profile',
+                headerStyle: { backgroundColor: theme.colors.background },
+                headerTintColor: theme.colors.text,
+              }}
+            />
+
+            <Stack.Screen
+              name="EditProfile"
+              component={EditProfileScreen}
+              options={{
+                headerShown: true,
+                title: 'Edit Profile',
                 headerStyle: { backgroundColor: theme.colors.background },
                 headerTintColor: theme.colors.text,
               }}

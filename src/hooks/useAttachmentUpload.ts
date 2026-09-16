@@ -141,6 +141,29 @@ export function useAttachmentUpload({
       const { id, storagePath, bucketId } = current.attachment;
       try {
         await supabase.storage.from(bucketId).remove([storagePath]);
+
+        const attachment = await supabase
+          .from('attachments')
+          .select('conversation_id')
+          .eq('id', id);
+
+        console.log('ADDED attachment: ', attachment);
+        if (!attachment.data) return;
+        const { conversation_id } = attachment.data[0];
+        if (conversation_id) {
+          const messages = await supabase
+            .from('messages')
+            .select('id, role, content')
+            .eq('conversation_id', conversation_id);
+
+          if (messages.data?.length === 0) {
+            // Empty draft conv => Delete it
+            await supabase
+              .from('conversations')
+              .delete()
+              .eq('id', conversation_id);
+          }
+        }
         await supabase.from('attachments').delete().eq('id', id);
       } catch {
         // Best-effort: the pg_cron purge job is the backstop for anything

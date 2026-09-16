@@ -1,12 +1,15 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useState } from 'react';
 import { s, vs } from 'react-native-size-matters';
-import { useThemedStyles } from '../theme';
+import { useTheme, useThemedStyles } from '../theme';
 import type { Theme } from '../theme';
 import AuthButton from '../components/AuthButton';
 import { useAuth } from '../auth/AuthProvider';
 import { useProfile } from '../hooks/useProfile';
 import { signOut } from '../auth/session';
+import { useNavigation } from '@react-navigation/native';
+import { navigationRef } from '../navigation/navigationRef';
+import UserAvatar from '../components/UserAvatar';
 
 const makeStyles = (theme: Theme) =>
   StyleSheet.create({
@@ -18,20 +21,7 @@ const makeStyles = (theme: Theme) =>
       gap: vs(12),
       backgroundColor: theme.colors.background,
     },
-    avatar: {
-      width: s(84),
-      height: s(84),
-      borderRadius: s(42),
-      backgroundColor: theme.colors.accent,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: vs(8),
-    },
-    avatarInitial: {
-      fontSize: s(32),
-      fontWeight: '700',
-      color: theme.colors.background,
-    },
+
     name: {
       fontSize: s(20),
       fontWeight: '700',
@@ -53,7 +43,7 @@ const ProfileScreen = () => {
   const { session } = useAuth();
   const { profile, displayName } = useProfile();
   const [isSigningOut, setIsSigningOut] = useState(false);
-
+  const navigation = useNavigation();
   const handleSignOut = async () => {
     setIsSigningOut(true);
     try {
@@ -67,14 +57,16 @@ const ProfileScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.avatar}>
-        <Text style={styles.avatarInitial}>
-          {displayName.charAt(0).toUpperCase()}
-        </Text>
-      </View>
+      <UserAvatar />
       <Text style={styles.name}>{displayName}</Text>
       <Text style={styles.email}>{profile?.email ?? session?.user.email}</Text>
 
+      <TouchableOpacity
+        style={styles.signOutButton}
+        onPress={() => navigationRef.navigate('EditProfile')}
+      >
+        <Text>Edit Profile</Text>
+      </TouchableOpacity>
       <AuthButton
         label="Sign out"
         loading={isSigningOut}

@@ -7,4 +7,5 @@ export type AppStackParamList = {
   Chat: undefined;
   Profile: undefined;
   Settings: undefined;
+  EditProfile: undefined;
 };
